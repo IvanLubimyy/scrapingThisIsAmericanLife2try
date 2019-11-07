@@ -1,6 +1,6 @@
 package com.company;
-import org.json.*;
 import org.apache.commons.io.FileUtils;
+import org.json.JSONObject;
 import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Wait;
@@ -90,10 +90,12 @@ public class Main {
              String str = playEpisod.getAttribute("text");
              JSONObject obj = new JSONObject(str);
              String mp3File = obj.getString("audio");
-             System.out.println(mp3File);
+             System.out.println("Start downloading:"+mp3File);
              //download mp3
 
-
+             DownLoadURL audioFile = new DownLoadURL(mp3File, "c:\\work\\1");
+             audioFile.downLoad();
+             System.out.println("Download ends. Congrats!");
                  //}
              //}
             //playEpisod.click();
