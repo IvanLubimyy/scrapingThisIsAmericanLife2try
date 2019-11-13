@@ -3,7 +3,6 @@ package com.company;
 import org.apache.commons.io.FileUtils;
 
 import java.io.File;
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -13,7 +12,7 @@ import static org.apache.commons.io.FilenameUtils.getName;
 /*
 download given file by url and save it with same name into given localPlace
  */
-public class DownLoadURL {
+public class DownLoadURL implements Runnable {
     // TimeOuts
     private static final int CONNECT_TIMEOUT = 1000;
     private static final int READ_TIMEOUT = 500;
@@ -23,22 +22,32 @@ public class DownLoadURL {
     private File FILE_NAME; // It's new file with fool path on the HDD
 
     DownLoadURL(String url, String localPlace) throws MalformedURLException {
-        this.FILE_URL = new URL(url);
+        try {
+            this.FILE_URL = new URL(url);
+        } catch (MalformedURLException e) {
+            e.printStackTrace();
+        }
         this.localPlace = localPlace;
         this.FILE_NAME = new File(concat(localPlace,
                                     getName(FILE_URL.getPath())));
 
     }
-    public void downLoad() throws IOException {
+    public void run()  {
         // It's first try without resume downloading, analytics for exceptions, threads
         System.out.println("FILE_URL:"+FILE_URL);
         System.out.println("FILE_NAME:"+FILE_NAME);
+        try {
+            FileUtils.copyURLToFile(
+                    FILE_URL,
+                    FILE_NAME);
+            //     , CONNECT_TIMEOUT, READ_TIMEOUT);
 
-        FileUtils.copyURLToFile(
-                FILE_URL,
-                FILE_NAME);
-        //,
-          //      CONNECT_TIMEOUT,
-            //    READ_TIMEOUT);
+        } catch (Exception e){
+            System.out.println("1 File "+FILE_NAME+" doesn't download :"+e);
+            System.err.println("2 " +e);
+            System.out.println("3 "+e.toString());
+            System.out.println("4 ");
+            e.printStackTrace();
+        }
     }
 }

@@ -54,8 +54,6 @@ public class Main {
         * find "thumbnail goto goto-episode" class on the page
         */
         public void findThumbnail() throws IOException {
-            //WebElement link = driver.findElement(By.className("thumbnail goto goto-episode"));
-
 
             WebElement link = driver.findElement(By.cssSelector("a.thumbnail.goto.goto-episode"));
             closeCookieWindow();
@@ -70,22 +68,11 @@ public class Main {
     }
 
          public void playEpisode() throws IOException, InterruptedException {
-            //WebElement playEpisod = driver.findElement(By.xpath("//div//main//div//div//div//article//header//div//div//a//span"));
-             //WebElement playEpisod = driver.findElement(By.cssSelector("css=script[id='playlist-data']"));
-            //WebElement playEpisod = driver.findElement(By.id("playlist-data"));
-             //WebElement playEpisod = driver.findElement(By.cssSelector("script#playlist-data"));
             FirstPage episodePade = new FirstPage(driver);
             episodePade.waiter("//*[@id='playlist-data']");
              //List<WebElement> playEpisods = driver.findElements(By.xpath("//script"));
              WebElement playEpisod = driver.findElement(By.xpath("//script[contains(@id,'playlist-data')]"));
-             //WebElement playEpisod = driver.findElement(By.tagName("script"));
-             //playEpisod.getT
-             //             #playlist-data
-             //         html.js.svg.pointerevents.opacity.rgba.supports.no-touchevents.fontface.nthchild.objectfit.object-fit.cssanimations.backgroundsize.borderradius.csscolumns.csscolumns-width.no-csscolumns-span.csscolumns-fill.csscolumns-gap.csscolumns-rule.csscolumns-rulecolor.csscolumns-rulestyle.csscolumns-rulewidth.no-csscolumns-breakbefore.no-csscolumns-breakafter.no-csscolumns-breakinside.csstransforms.csstransforms3d.csstransitions.wf-maiola-n5-active.wf-maiola-i4-active.wf-maiola-n4-active.wf-maiola-n7-active.wf-maiola-i7-active.wf-maiola-i5-active.wf-active body.html.not-front.not-logged-in.no-sidebars.loaded.node-type-episode.page-682.page-episode-number-682 div#content main#main div.region.region-content div#block-system-main.block.block-system div.content article.node.node-episode.view-full.clearfix.episode-number-682.with-image.image-landscape.image-shifter.links-processed script#playlist-data
-             //*[@id="playlist-data"]
-             //for (WebElement playEpisod : playEpisods) {
-                // if (playEpisod.getAttribute("type")=="application/json"){
-                 System.out.println("Нажал: tag:" + playEpisod.getTagName()+" id:"+playEpisod.getAttribute("id")+" text:"+playEpisod.getAttribute("text")+" title:"+playEpisod.getAttribute("title"));
+             System.out.println("Нажал: tag:" + playEpisod.getTagName()+" id:"+playEpisod.getAttribute("id")+" text:"+playEpisod.getAttribute("text")+" title:"+playEpisod.getAttribute("title"));
 //Json work
              String str = playEpisod.getAttribute("text");
              JSONObject obj = new JSONObject(str);
@@ -93,9 +80,14 @@ public class Main {
              System.out.println("Start downloading:"+mp3File);
              //download mp3
 
-             DownLoadURL audioFile = new DownLoadURL(mp3File, "c:\\work\\1");
-             audioFile.downLoad();
-             System.out.println("Download ends. Congrats!");
+             Thread audioFile = new Thread(new DownLoadURL(mp3File, "c:\\work\\1"));
+             try {
+                 audioFile.sleep(3000);
+                 audioFile.start();
+                 System.out.println("Download " + mp3File + " ends. Congrats!");
+             } catch(InterruptedException e) {
+                 e.printStackTrace();
+             }
                  //}
              //}
             //playEpisod.click();
@@ -130,12 +122,9 @@ public class Main {
         public static void main(String[] args) throws IOException, InterruptedException {
             Main webSrcapper = new Main();
             webSrcapper.openTestSite();
-            //webSrcapper.login("admin", "12345");
-            //webSrcapper.getText();
-            //
-            //webSrcapper.closeCookieWindow();
+
             webSrcapper.findThumbnail();
-            //webSrcapper.closeCookieWindow();
+
             webSrcapper.playEpisode();
             //webSrcapper.closeBrowser();
         }
