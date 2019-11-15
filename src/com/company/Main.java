@@ -5,6 +5,7 @@ import org.openqa.selenium.*;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
+import java.util.List;
 
 import java.io.*;
 
@@ -22,11 +23,9 @@ public class Main {
             driver.navigate().to("https://www.thisamericanlife.org/archive?year=2018");
         }
 
-        /**
-         *
+        /*
          * @param username
          * @param Password
-         *
          *            Logins into the website, by entering provided username and
          *            password
          */
@@ -66,15 +65,31 @@ public class Main {
             System.out.println("Нашел: "+link);
             //link.click();
     }
+    /*
+     * find all "thumbnail goto goto-episode" classes on the page
+     */
+    public void findAllThumbnails() throws IOException, InterruptedException {
+        List<WebElement> links = driver.findElements(By.cssSelector("a.thumbnail.goto.goto-episode"));
+        for (WebElement link : links) {
+            // does this work? What about path?
+            driver.navigate().to("https://www.thisamericanlife.org"+link.getAttribute("href")); //.to("https://www.thisamericanlife.org/archive?year=2018");
+            playEpisode();
+            //JavascriptExecutor executor = (JavascriptExecutor) driver;
+            //executor.executeScript("arguments[0].click();", link);
+        }
+    }
 
+        /*
+        Find and play episode
+        */
          public void playEpisode() throws IOException, InterruptedException {
-            FirstPage episodePade = new FirstPage(driver);
-            episodePade.waiter("//*[@id='playlist-data']");
-             //List<WebElement> playEpisods = driver.findElements(By.xpath("//script"));
-             WebElement playEpisod = driver.findElement(By.xpath("//script[contains(@id,'playlist-data')]"));
-             System.out.println("Нажал: tag:" + playEpisod.getTagName()+" id:"+playEpisod.getAttribute("id")+" text:"+playEpisod.getAttribute("text")+" title:"+playEpisod.getAttribute("title"));
+            FirstPage episodePage = new FirstPage(driver);
+            episodePage.waiter("//*[@id='playlist-data']");
+             //List<WebElement> playEpisodes = driver.findElements(By.xpath("//script"));
+             WebElement playEpisode = driver.findElement(By.xpath("//script[contains(@id,'playlist-data')]"));
+             System.out.println("Нажал: tag:" + playEpisode.getTagName()+" id:"+playEpisode.getAttribute("id")+" text:"+playEpisode.getAttribute("text")+" title:"+playEpisode.getAttribute("title"));
 //Json work
-             String str = playEpisod.getAttribute("text");
+             String str = playEpisode.getAttribute("text");
              JSONObject obj = new JSONObject(str);
              String mp3File = obj.getString("audio");
              System.out.println("Start downloading:"+mp3File);
@@ -85,6 +100,7 @@ public class Main {
                  audioFile.sleep(3000);
                  audioFile.start();
                  System.out.println("Download " + mp3File + " ends. Congrats!");
+                 audioFile.sleep(180000); // wait 3 minutes to start new download tread
              } catch(InterruptedException e) {
                  e.printStackTrace();
              }
@@ -122,10 +138,11 @@ public class Main {
         public static void main(String[] args) throws IOException, InterruptedException {
             Main webSrcapper = new Main();
             webSrcapper.openTestSite();
+            webSrcapper.findAllThumbnails();
 
-            webSrcapper.findThumbnail();
+            //webSrcapper.findThumbnail();
 
-            webSrcapper.playEpisode();
+            //webSrcapper.playEpisode();
             //webSrcapper.closeBrowser();
         }
 }
