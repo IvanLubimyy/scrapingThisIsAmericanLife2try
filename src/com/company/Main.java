@@ -6,6 +6,8 @@ import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.support.ui.Wait;
 import org.openqa.selenium.support.ui.WebDriverWait;
 import java.util.List;
+import java.net.URL;
+import java.util.ArrayList;
 
 import java.io.*;
 
@@ -69,14 +71,22 @@ public class Main {
      * find all "thumbnail goto goto-episode" classes on the page
      */
     public void findAllThumbnails() throws IOException, InterruptedException {
+        List<String> linksOfEpisodes= new ArrayList<String>();
+        FirstPage episodePage = new FirstPage(driver);
+        episodePage.waiter("//*[@class='thumbnail goto goto-episode']");
+
         List<WebElement> links = driver.findElements(By.cssSelector("a.thumbnail.goto.goto-episode"));
+        // remember all links before we will update page
         for (WebElement link : links) {
-            // does this work? What about path?
-            driver.navigate().to("https://www.thisamericanlife.org"+link.getAttribute("href")); //.to("https://www.thisamericanlife.org/archive?year=2018");
-            playEpisode();
-            //JavascriptExecutor executor = (JavascriptExecutor) driver;
-            //executor.executeScript("arguments[0].click();", link);
+            if (link==null) { System.out.println("Empty list"); return; }
+            else {linksOfEpisodes.add(link.getAttribute("href").toString());}
         }
+        // download audio from all pages
+        for (String Episode :linksOfEpisodes ) {
+            driver.navigate().to(new URL(Episode));
+            playEpisode();
+        }
+
     }
 
         /*
@@ -94,7 +104,10 @@ public class Main {
              String mp3File = obj.getString("audio");
              System.out.println("Start downloading:"+mp3File);
              //download mp3
-
+//todo add limit of the number of sessions
+//todo remove additional waiting
+//todo refactoring (think about architecture and UI)
+//todo add Singleton for logging
              Thread audioFile = new Thread(new DownLoadURL(mp3File, "c:\\work\\1"));
              try {
                  audioFile.sleep(3000);

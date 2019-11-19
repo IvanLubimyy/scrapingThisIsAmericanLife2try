@@ -37,11 +37,14 @@ public class DownLoadURL implements Runnable {
         System.out.println("FILE_URL:"+FILE_URL);
         System.out.println("FILE_NAME:"+FILE_NAME);
         try {
-            FileUtils.copyURLToFile(
-                    FILE_URL,
-                    FILE_NAME);
-            //     , CONNECT_TIMEOUT, READ_TIMEOUT);
-
+            if (!FILE_NAME.exists()) { // checking for existing the file before start the download
+                FileUtils.copyURLToFile(
+                        FILE_URL,
+                        FILE_NAME);
+                //     , CONNECT_TIMEOUT, READ_TIMEOUT);
+            }else{
+                System.out.println("File "+FILE_NAME+" just exist!");
+            }
         } catch (Exception e){
             System.out.println("1 File "+FILE_NAME+" doesn't download :"+e);
             System.err.println("2 " +e);
