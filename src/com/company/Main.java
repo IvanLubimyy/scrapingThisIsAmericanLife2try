@@ -143,6 +143,7 @@ public class Main {
              }
             return audioFile;
     }
+    //todo add junit
 //todo add limit of the number of sessions to downloading
 //todo refactoring (think about architecture and UI)
 //todo add Singleton for logging
