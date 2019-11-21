@@ -24,7 +24,7 @@ public class Main {
         public List<String> linksOfEpisodes= new ArrayList<String>(); //list of episodes we will download
         public WebDriver driver = new FirefoxDriver();
         public String targetPage = "https://www.thisamericanlife.org/archive?year=2018";
-        public int workingStreams = 10;
+        public int workingStreams = 2;
         public String localPlace = "c:\\work\\1";
 
         private final Wait<WebDriver> wait = new WebDriverWait(driver, 20, 1000);
@@ -97,14 +97,28 @@ public class Main {
 
     // download audio from all pages
     public void downloadList() throws IOException, InterruptedException {
+
+        RunTasksList downloadsTasks = new RunTasksList();
+
         for (String Episode :linksOfEpisodes ) {
             driver.navigate().to(new URL(Episode));
+
             Thread taskToDownload = playEpisode();
+
             if(taskToDownload ==null){
                 System.out.println("Episode "+Episode+" does not have audio content");
             }else{
-//todo add counter of treads
-                System.out.println("Download " +taskToDownload.getName()+ " ends. Congrats!");
+
+                //counter of treads
+                downloadsTasks.add(taskToDownload);
+
+                //check limit of the number of sessions to downloading
+                if(downloadsTasks.size() < workingStreams){
+                    continue;    // add next in the loop
+                }
+                else { //wait 3 minutes
+                    downloadsTasks.get(0).join(180000); // wait when first task ends
+                }
             }
         }
     }
@@ -113,9 +127,9 @@ public class Main {
         Find and play episode
         */
          public Thread playEpisode() throws IOException, InterruptedException {
-            //Page episodePage = new FirstPage(driver);
+
              waiter("//*[@id='playlist-data']");
-             //List<WebElement> playEpisodes = driver.findElements(By.xpath("//script"));
+
              WebElement playEpisode = driver.findElement(By.xpath("//script[contains(@id,'playlist-data')]"));
              if (playEpisode==null){
                  return null;
@@ -143,8 +157,8 @@ public class Main {
              }
             return audioFile;
     }
-    //todo add junit
-//todo add limit of the number of sessions to downloading
+//todo check exist files first
+//todo add junit
 //todo refactoring (think about architecture and UI)
 //todo add Singleton for logging
         /**

@@ -47,10 +47,7 @@ public class DownLoadURL implements Runnable {
             }
         } catch (Exception e){
             System.out.println("1 File "+FILE_NAME+" doesn't download :"+e);
-            System.err.println("2 " +e);
-            System.out.println("3 "+e.toString());
-            System.out.println("4 ");
-            e.printStackTrace();
+            //todo add delete (or change file extinction) uncompleted download or update download
         }
     }
 }
