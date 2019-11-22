@@ -181,7 +181,6 @@ public class Main {
                 for (String episode :linksOfEpisodes) {
                     if(episode.contains(nameMp3File)){
                         deleteOfEpisodes.add(episode);
-                        System.out.println(episode+" have "+nameMp3File);
                     }
                 }
             }
@@ -223,7 +222,7 @@ public class Main {
           }
 
         public void closeBrowser() {
-            driver.close();driver.close();
+            driver.close();
         }
 
         public static void main(String[] args) throws IOException, InterruptedException {
