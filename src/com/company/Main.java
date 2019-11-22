@@ -1,4 +1,5 @@
 package com.company;
+
 import org.apache.commons.io.FileUtils;
 import org.json.JSONObject;
 import org.openqa.selenium.*;
@@ -10,7 +11,11 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 import java.io.*;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+
+import static org.apache.commons.io.FilenameUtils.getBaseName;
 
 //import org.junit.*;
 
@@ -23,7 +28,7 @@ Main class where we can
 public class Main {
         public List<String> linksOfEpisodes= new ArrayList<String>(); //list of episodes we will download
         public WebDriver driver = new FirefoxDriver();
-        public String targetPage = "https://www.thisamericanlife.org/archive?year=2018";
+        public String targetPage = "https://www.thisamericanlife.org/archive?year=2019";
         public int workingStreams = 2;
         public String localPlace = "c:\\work\\1";
 
@@ -139,7 +144,7 @@ public class Main {
              String str = playEpisode.getAttribute("text");
              JSONObject obj = new JSONObject(str);
              String mp3File = obj.getString("audio");
-             System.out.println("Start downloading:"+mp3File);
+             //System.out.println("Start downloading:"+mp3File);
              //download mp3
 
              Thread audioFile = new Thread(new DownLoadURL(mp3File, localPlace));
@@ -147,7 +152,7 @@ public class Main {
                  audioFile.sleep(3000);
                  audioFile.start();
                  audioFile.setName(mp3File);
-                 System.out.println("Download " + mp3File + " starts");
+                 //System.out.println("Download " + mp3File + " starts");
 
                  //audioFile.sleep(180000); // wait 3 minutes to start new download tread
              } catch(InterruptedException e) {
@@ -157,7 +162,36 @@ public class Main {
              }
             return audioFile;
     }
-//todo check exist files first
+
+    //  This method checks  linksOfEpisodes and removes exist (into target directory) files from it
+        public void removeExistFiles(){
+             LinkedHashSet<String> deleteOfEpisodes= new LinkedHashSet<>();
+
+             //get list of mp3 files in target directory (localPlace)
+             File dir = new File(localPlace);
+             File[] files = dir.listFiles(new FilenameFilter() {
+                public boolean accept(File dir, String name) {
+                    return name.toLowerCase().endsWith(".mp3");
+                }
+            });
+             //check and remove exist files
+            for (File fileInList: files ) {
+                String nameMp3File = getBaseName(fileInList.getName());
+
+                for (String episode :linksOfEpisodes) {
+                    if(episode.contains(nameMp3File)){
+                        deleteOfEpisodes.add(episode);
+                        System.out.println(episode+" have "+nameMp3File);
+                    }
+                }
+            }
+            Iterator<String> iterator = deleteOfEpisodes.iterator();
+
+            while (iterator.hasNext()) {
+                linksOfEpisodes.remove(iterator.next());
+            }
+
+        }
 //todo add junit
 //todo refactoring (think about architecture and UI)
 //todo add Singleton for logging
@@ -189,7 +223,7 @@ public class Main {
           }
 
         public void closeBrowser() {
-            driver.close();
+            driver.close();driver.close();
         }
 
         public static void main(String[] args) throws IOException, InterruptedException {
@@ -197,11 +231,9 @@ public class Main {
             webSrcapper.openTestSite();
             // if we have not episodes then quit
             if (!webSrcapper.findAllThumbnails()) { return; }
+            webSrcapper.removeExistFiles();
             webSrcapper.downloadList();
+            webSrcapper.closeBrowser();
 
-            //webSrcapper.findThumbnail();
-
-            //webSrcapper.playEpisode();
-            //webSrcapper.closeBrowser();
         }
 }
